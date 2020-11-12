@@ -8,8 +8,7 @@ LICENSE file in the root directory of this source tree.
 import torch
 from torch import nn
 from torch.nn import functional as F
-from .unet_module import ConvBlock, TransposeConvBlock
-
+from .unet import ConvBlock, TransposeConvBlock
 
 class NnRet(nn.Module):
     def __init__(
