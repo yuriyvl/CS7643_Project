@@ -12,6 +12,7 @@ from fastmri.models import NnRet
 from torch.nn import functional as F
 
 from .mri_module import MriModule
+from .unet_module import UnetModule
 
 
 class NnRetModule(MriModule):
@@ -103,50 +104,4 @@ class NnRetModule(MriModule):
 
     @staticmethod
     def add_model_specific_args(parent_parser):  # pragma: no-cover
-        """
-        Define parameters that only apply to this model
-        """
-        parser = ArgumentParser(parents=[parent_parser], add_help=False)
-        parser = MriModule.add_model_specific_args(parser)
-
-        # network params
-        parser.add_argument(
-            "--in_chans", default=1, type=int, help="Number of NNRET input channels"
-        )
-        parser.add_argument(
-            "--out_chans", default=1, type=int, help="Number of NNRET output chanenls"
-        )
-        parser.add_argument(
-            "--chans", default=1, type=int, help="Number of top-level NNRET filters."
-        )
-        parser.add_argument(
-            "--num_pool_layers",
-            default=4,
-            type=int,
-            help="Number of NNRET pooling layers.",
-        )
-        parser.add_argument(
-            "--drop_prob", default=0.0, type=float, help="NNRET dropout probability"
-        )
-
-        # training params (opt)
-        parser.add_argument(
-            "--lr", default=0.001, type=float, help="RMSProp learning rate"
-        )
-        parser.add_argument(
-            "--lr_step_size",
-            default=40,
-            type=int,
-            help="Epoch at which to decrease step size",
-        )
-        parser.add_argument(
-            "--lr_gamma", default=0.1, type=float, help="Amount to decrease step size"
-        )
-        parser.add_argument(
-            "--weight_decay",
-            default=0.0,
-            type=float,
-            help="Strength of weight decay regularization",
-        )
-
-        return parser
+        return UnetModule.add_model_specific_args(parent_parser)

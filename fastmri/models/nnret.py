@@ -10,6 +10,8 @@ from torch import nn
 from torch.nn import functional as F
 from .unet import ConvBlock, TransposeConvBlock
 
+# The code for NNRET is very similar to vanilla UNET with the major change being 
+# the change from transpose convolutions + concat to KNN instead
 class NnRet(nn.Module):
     def __init__(
         self,
@@ -49,6 +51,8 @@ class NnRet(nn.Module):
             )
         )
 
+        self.knn = nn.Upsample(scale_factor=2, mode='nearest')
+
     def forward(self, image: torch.Tensor) -> torch.Tensor:
         """
         Args:
@@ -67,11 +71,18 @@ class NnRet(nn.Module):
             output = F.avg_pool2d(output, kernel_size=2, stride=2, padding=0)
 
         output = self.conv(output)
-        
+        #print(output.shape) (1, 512, 20, 20)
+
         # apply up-sampling layers
-        for transpose_conv, conv in zip(self.up_transpose_conv, self.up_conv):
+        for conv in self.up_conv:
             downsample_layer = stack.pop()
-            output = transpose_conv(output)
+            # 4 loops
+            # (1, 512, 20, 20)
+            #print(output.shape)
+            #output = transpose_conv(output)
+            output = self.knn(output)
+            #print(output.shape)
+            # (1, 256, 40, 40)
 
             # reflect pad on the right/botton if needed to handle odd input dimensions.
             padding = [0, 0, 0, 0]
@@ -82,7 +93,10 @@ class NnRet(nn.Module):
             if torch.sum(torch.tensor(padding)) != 0:
                 output = F.pad(output, padding, "reflect")
 
-            output = torch.cat([output, downsample_layer], dim=1)
+            #output = torch.cat([output, downsample_layer], dim=1)
+            #print('yiss')
+            #print(output.shape)
+            
             output = conv(output)
 
         return output

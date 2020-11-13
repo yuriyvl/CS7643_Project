@@ -17,6 +17,5 @@ fastmri_dirs.yaml
 dataset_cache.pkl
 .mypy_cache/
 
-#Ignore dataset
+#Ignore zipped dataset
 *.tar.gz
-*.h5
