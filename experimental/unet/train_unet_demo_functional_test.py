@@ -50,7 +50,7 @@ def cli_main(args):
     #print(type(args.data_path))
     # ptl data module - this handles data loaders
     data_module = FastMriDataModule(
-        data_path=Path('knee_func_test'),
+        data_path=Path('../knee_func_test'),
         challenge=args.challenge,
         train_transform=train_transform,
         val_transform=val_transform,
