@@ -71,18 +71,11 @@ class NnRet(nn.Module):
             output = F.avg_pool2d(output, kernel_size=2, stride=2, padding=0)
 
         output = self.conv(output)
-        #print(output.shape) (1, 512, 20, 20)
 
         # apply up-sampling layers
         for conv in self.up_conv:
             downsample_layer = stack.pop()
-            # 4 loops
-            # (1, 512, 20, 20)
-            #print(output.shape)
-            #output = transpose_conv(output)
             output = self.knn(output)
-            #print(output.shape)
-            # (1, 256, 40, 40)
 
             # reflect pad on the right/botton if needed to handle odd input dimensions.
             padding = [0, 0, 0, 0]
@@ -93,10 +86,6 @@ class NnRet(nn.Module):
             if torch.sum(torch.tensor(padding)) != 0:
                 output = F.pad(output, padding, "reflect")
 
-            #output = torch.cat([output, downsample_layer], dim=1)
-            #print('yiss')
-            #print(output.shape)
-            
             output = conv(output)
 
         return output
