@@ -7,30 +7,13 @@ LICENSE file in the root directory of this source tree.
 
 import os
 import pathlib
-from pathlib import Path
 from argparse import ArgumentParser
 
 import pytorch_lightning as pl
 from fastmri.data.mri_data import fetch_dir
 from fastmri.data.subsample import create_mask_for_mask_type
 from fastmri.data.transforms import UnetDataTransform
-from fastmri.pl_modules import FastMriDataModule, UnetModule
-
-# Set these however you want but don't touch the rest unless you want awful things to happen.
-num_gpus = 1
-backend = "dp"
-
-
-
-'''
-
-
- - Leave everything below as is -
-
-
-
-'''
-
+from fastmri.pl_modules import FastMriDataModule, NnRetModule
 
 
 def cli_main(args):
@@ -47,10 +30,9 @@ def cli_main(args):
     train_transform = UnetDataTransform(args.challenge, mask_func=mask, use_seed=False)
     val_transform = UnetDataTransform(args.challenge, mask_func=mask)
     test_transform = UnetDataTransform(args.challenge, mask_func=mask)
-    #print(type(args.data_path))
     # ptl data module - this handles data loaders
     data_module = FastMriDataModule(
-        data_path=Path('../knee_func_test'),
+        data_path=args.data_path,
         challenge=args.challenge,
         train_transform=train_transform,
         val_transform=val_transform,
@@ -66,7 +48,7 @@ def cli_main(args):
     # ------------
     # model
     # ------------
-    model = UnetModule(
+    model = NnRetModule(
         in_chans=args.in_chans,
         out_chans=args.out_chans,
         chans=args.chans,
@@ -99,11 +81,13 @@ def build_args():
 
     # basic args
     path_config = pathlib.Path("../../fastmri_dirs.yaml")
+    num_gpus = 1
+    backend = "dp"
     batch_size = 1 if backend == "ddp" else num_gpus
 
     # set defaults based on optional directory config
     data_path = fetch_dir("knee_path", path_config)
-    default_root_dir = fetch_dir("log_path", path_config) / "unet" / "unet_demo"
+    default_root_dir = fetch_dir("log_path", path_config) / "nnret" / "nnret_demo"
 
     # client arguments
     parser.add_argument(
@@ -142,12 +126,12 @@ def build_args():
     parser.set_defaults(data_path=data_path, batch_size=batch_size, test_path=None)
 
     # module config
-    parser = UnetModule.add_model_specific_args(parser)
+    parser = NnRetModule.add_model_specific_args(parser)
     parser.set_defaults(
-        in_chans=1,  # number of input channels to U-Net
-        out_chans=1,  # number of output chanenls to U-Net
-        chans=32,  # number of top-level U-Net channels
-        num_pool_layers=4,  # number of U-Net pooling layers
+        in_chans=1,  # number of input channels to NNRET
+        out_chans=1,  # number of output chanenls to NNRET
+        chans=32,  # number of top-level NNRET channels
+        num_pool_layers=4,  # number of NNRET pooling layers
         drop_prob=0.0,  # dropout probability
         lr=0.001,  # RMSProp learning rate
         lr_step_size=40,  # epoch at which to decrease learning rate
@@ -164,10 +148,31 @@ def build_args():
         seed=42,  # random seed
         deterministic=True,  # makes things slower, but deterministic
         default_root_dir=default_root_dir,  # directory for logs and checkpoints
-        max_epochs=1,  # max number of epochs
+        max_epochs=50,  # max number of epochs
     )
 
     args = parser.parse_args()
+
+    # configure checkpointing in checkpoint_dir
+    checkpoint_dir = args.default_root_dir / "checkpoints"
+    if not checkpoint_dir.exists():
+        checkpoint_dir.mkdir(parents=True)
+
+    args.checkpoint_callback = pl.callbacks.ModelCheckpoint(
+        filepath=args.default_root_dir / "checkpoints",
+        save_top_k=True,
+        verbose=True,
+        monitor="val_loss",
+        mode="min",
+        prefix="",
+    )
+
+    # set default checkpoint if one exists in our checkpoint directory
+    if args.resume_from_checkpoint is None:
+        ckpt_list = sorted(checkpoint_dir.glob("*.ckpt"), key=os.path.getmtime)
+        if ckpt_list:
+            args.resume_from_checkpoint = str(ckpt_list[-1])
+
     return args
 
 
