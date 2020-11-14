@@ -19,3 +19,4 @@ dataset_cache.pkl
 
 #Ignore zipped dataset
 *.tar.gz
+*.h5
