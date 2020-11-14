@@ -12,6 +12,7 @@ from .unet import ConvBlock, TransposeConvBlock
 
 # The code for NNRET is very similar to vanilla UNET with the major change being 
 # the change from transpose convolutions + concat to KNN instead
+# NNRET model implemented from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6583803/
 class NnRet(nn.Module):
     def __init__(
         self,
