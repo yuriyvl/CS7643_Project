@@ -15,6 +15,7 @@ from fastmri.data.subsample import create_mask_for_mask_type
 from fastmri.data.transforms import UnetDataTransform
 from fastmri.pl_modules import FastMriDataModule, UnetModule
 
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 def cli_main(args):
     pl.seed_everything(args.seed)
