@@ -83,11 +83,12 @@ class NestedUnet(nn.Module):
         x0_4 = self.conv0_4(torch.cat([x0_0, x0_1, x0_2, x0_3, self.up(x1_3)], 1))
 
         if self.deep_supervision:
-            output1 = self.final1(x0_1)
-            output2 = self.final2(x0_2)
-            output3 = self.final3(x0_3)
-            output4 = self.final4(x0_4)
-            return [output1, output2, output3, output4]
+            output = self.final1(x0_1)
+            output += self.final2(x0_2)
+            output += self.final3(x0_3)
+            output += self.final4(x0_4)
+            output /= 4
+            return output
 
         else:
             output = self.final(x0_4)
