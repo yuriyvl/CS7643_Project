@@ -8,4 +8,6 @@ LICENSE file in the root directory of this source tree.
 from .unet import Unet
 from .nnret import NnRet
 from .r2unet import R2Unet
+from .nestedunet import NestedUnet
+from .dunet import DenseUNet
 from .varnet import NormUnet, SensitivityModel, VarNet, VarNetBlock

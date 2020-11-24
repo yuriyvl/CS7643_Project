@@ -3,7 +3,6 @@ __pycache__
 experiments
 logs
 .idea
-*.png
 *.cfl
 *.hdr
 *egg-info*
