@@ -10,5 +10,6 @@ from .unet_module import UnetModule
 from .nestedunet_module import NestedUnetModule
 from .varnet_module import VarNetModule
 from .nnret_module import NnRetModule
+from .dunet_module import DenseUnetModule
 from .data_module import FastMriDataModule
 
