@@ -1,8 +1,9 @@
 from pathlib import Path
 import re
+import matplotlib.pyplot as plt
 
-def get_all_lines():
-    path = Path("nnret/") / 'nnrnet_output.txt'
+def get_all_lines(folder, name):
+    path = Path(folder) / name
     opened = open(path, encoding='utf8')
     return opened.readlines()
 
@@ -35,6 +36,37 @@ def get_tokens(lines):
 
     return epochs, train_losses, val_losses
 
-all_lines = get_all_lines()
-useful_lines = get_useful_lines(all_lines)
-epochs, train_losses, val_losses = get_tokens(useful_lines)
+def plot(epochs, losses, ylabel):
+    _, ax = plt.subplots()
+    plt.plot(epochs, losses)
+    
+    for n, label in enumerate(ax.xaxis.get_ticklabels()):
+        if n % 3 != 0:
+            label.set_visible(False)
+    
+    plt.xlabel('Epochs')
+    plt.ylabel(ylabel)
+    plt.gca().invert_yaxis()
+    plt.show()
+
+def clean_val(epochs, val_losses):
+    new_epochs = []
+    new_val_losses = []
+
+    for i in range(len(val_losses)):
+        if val_losses[i] is not None:
+            new_epochs.append(epochs[i])
+            new_val_losses.append(val_losses[i])
+    
+    return new_epochs, new_val_losses
+
+def run():
+    unet_all_lines = get_all_lines('unet_original/', 'output.txt')
+    unet_useful_lines = get_useful_lines(unet_all_lines)
+    unet_epochs, unet_train_losses, unet_val_losses = get_tokens(unet_useful_lines)
+    unet_clean_epochs, unet_clean_val_losses = clean_val(unet_epochs, unet_val_losses)
+    
+    plot(unet_epochs, unet_train_losses, 'Training Loss')
+    plot(unet_clean_epochs, unet_clean_val_losses, 'Validation Loss')
+
+run()
