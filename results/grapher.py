@@ -36,37 +36,60 @@ def get_tokens(lines):
 
     return epochs, train_losses, val_losses
 
-def plot(epochs, losses, ylabel):
-    _, ax = plt.subplots()
-    plt.plot(epochs, losses)
+def clean_train(epochs, train_losses):
+    new_epochs = []
+    new_train_losses = []
+
+    for i in range(len(epochs)):
+        if '%' not in epochs[i] and len(train_losses[i]) < 7:
+            new_epochs.append(epochs[i])
+            new_train_losses.append(train_losses[i])
     
-    for n, label in enumerate(ax.xaxis.get_ticklabels()):
-        if n % 3 != 0:
-            label.set_visible(False)
-    
-    plt.xlabel('Epochs')
-    plt.ylabel(ylabel)
-    plt.gca().invert_yaxis()
-    plt.show()
+    return new_epochs, new_train_losses
 
 def clean_val(epochs, val_losses):
     new_epochs = []
     new_val_losses = []
 
     for i in range(len(val_losses)):
-        if val_losses[i] is not None:
+        if val_losses[i] is not None and len(val_losses[i]) < 7 and '%' not in epochs[i]:
             new_epochs.append(epochs[i])
             new_val_losses.append(val_losses[i])
     
     return new_epochs, new_val_losses
 
-def run():
-    unet_all_lines = get_all_lines('unet_original/', 'output.txt')
-    unet_useful_lines = get_useful_lines(unet_all_lines)
-    unet_epochs, unet_train_losses, unet_val_losses = get_tokens(unet_useful_lines)
-    unet_clean_epochs, unet_clean_val_losses = clean_val(unet_epochs, unet_val_losses)
-    
-    plot(unet_epochs, unet_train_losses, 'Training Loss')
-    plot(unet_clean_epochs, unet_clean_val_losses, 'Validation Loss')
+def plot(epochs, losses, y_label, name, debug=True):
+    epochs = [float(i) for i in epochs]
+    losses = [float(i) for i in losses]
 
-run()
+    _, ax = plt.subplots()
+    plt.plot(epochs, losses)
+    
+    plt.title(name)
+    plt.xlabel('Epochs')
+    plt.ylabel(y_label)
+    
+    if debug:
+        plt.show()
+    else:
+        plt.savefig(name + '_' + y_label + '.png', bbox_inches='tight')
+
+def run_model(model_name, folder, file_name, debug=True):
+    all_lines = get_all_lines(folder, file_name)
+    useful_lines = get_useful_lines(all_lines)
+    epochs, train_losses, val_losses = get_tokens(useful_lines)
+    
+    clean_train_epochs, clean_train_losses = clean_train(epochs, train_losses)
+    clean_val_epochs, clean_val_losses = clean_val(epochs, val_losses)
+    
+    plot(clean_train_epochs, clean_train_losses, 'Training Loss', model_name, debug)
+    plot(clean_val_epochs, clean_val_losses, 'Validation Loss', model_name, debug)
+
+def run(debug=True):
+    run_model('U-Net', 'unet_original/', 'output.txt', debug)
+    run_model('Dense U-Net', 'denseunet/', 'results.txt', debug)
+    run_model('U-Net+', 'unetplus/', 'results.txt', debug)
+    run_model('U-Net+ Deep Supervision', 'unetplus_deepsupervision/', 'results.txt', debug)
+    run_model('NNRET', 'nnret/', 'nnrnet_output.txt', debug)
+
+run(False)
