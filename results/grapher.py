@@ -91,5 +91,6 @@ def run(debug=True):
     run_model('U-Net+', 'unetplus/', 'results.txt', debug)
     run_model('U-Net+ Deep Supervision', 'unetplus_deepsupervision/', 'results.txt', debug)
     run_model('NNRET', 'nnret/', 'nnrnet_output.txt', debug)
+    run_model('R2U-Net', 'r2unet/', 'results.txt', debug)
 
 run(False)
