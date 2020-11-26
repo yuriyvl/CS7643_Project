@@ -88,7 +88,7 @@ def build_args():
 
     # set defaults based on optional directory config
     data_path = fetch_dir("knee_path", path_config)
-    default_root_dir = fetch_dir("log_path", path_config) / "unet" / "unet_demo"
+    default_root_dir = fetch_dir("log_path", path_config) / "r2unet" / "r2unet_demo"
 
     # client arguments
     parser.add_argument(
@@ -129,10 +129,10 @@ def build_args():
     # module config
     parser = R2UnetModule.add_model_specific_args(parser)
     parser.set_defaults(
-        in_chans=1,  # number of input channels to U-Net
-        out_chans=1,  # number of output chanenls to U-Net
-        chans=32,  # number of top-level U-Net channels
-        num_pool_layers=4,  # number of U-Net pooling layers
+        in_chans=1,  # number of input channels to r2-U-Net
+        out_chans=1,  # number of output chanenls to r2-U-Net
+        chans=32,  # number of top-level r2-U-Net channels
+        num_pool_layers=4,  # number of r2-U-Net pooling layers
         drop_prob=0.0,  # dropout probability
         lr=0.001,  # RMSProp learning rate
         lr_step_size=40,  # epoch at which to decrease learning rate
