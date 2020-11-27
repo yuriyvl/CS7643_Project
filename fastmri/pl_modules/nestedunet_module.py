@@ -18,13 +18,13 @@ from .unet_module import UnetModule
 class NestedUnetModule(MriModule):
     def __init__(
         self,
-        in_chans=1,
+        in_chans=3,
         out_chans=1,
         chans=32,
         num_pool_layers=4,
         drop_prob=0.0,
-        lr=0.001,
-        lr_step_size=40,
+        lr=0.01,
+        lr_step_size=20,
         lr_gamma=0.1,
         weight_decay=0.0,
         **kwargs,
