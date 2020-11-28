@@ -275,19 +275,27 @@ class UnetDataTransform:
                 fname: File name.
                 slice_num: Serial number of the slice.
         """
+        # kspace is a numpy array of shape (640, 368) and is of the form 1.+1.j
+        # to_tensor converts kspace to (640, 368, 2) separating out the real and imaginary part by stacking them
+        # 640, 368, 0 => real part, 640, 368, 1 => imaginary part
         kspace = to_tensor(kspace)
 
         # check for max value
         max_value = attrs["max"] if "max" in attrs.keys() else 0.0
 
         # apply mask
+        # kspace is the actual ground truth data. By applying mask we simulate under sampling.
+        # masked_kspace is the undersampled version of kspace
+        # masked_kspace is now torch.Size([640, 368, 2])
         if self.mask_func:
             seed = None if not self.use_seed else tuple(map(ord, fname))
             masked_kspace, mask = apply_mask(kspace, self.mask_func, seed)
         else:
             masked_kspace = kspace
-
+            
         # inverse Fourier transform to get zero filled solution
+        # apply inverse Fourier transform to masked_kspace to get the undersampled image out
+        # image is torch.Size([640, 368, 2])
         image = fastmri.ifft2c(masked_kspace)
 
         # crop input to correct size
@@ -300,9 +308,18 @@ class UnetDataTransform:
         if image.shape[-2] < crop_size[1]:
             crop_size = (image.shape[-2], image.shape[-2])
 
+        # Crop the image to ground truth target shape
+        # image is now torch.Size([320, 320, 2])
         image = complex_center_crop(image, crop_size)
+        
+        # We need to pass this undersampled masked_kspace for post processing the Unet output image
+        # crop the masked_kspace to (320, 320, 2)
+        ksp_mask = complex_center_crop(masked_kspace, crop_size)
 
         # absolute value
+        # Take the absolute value of inverse fourier transform to get the actual image out.
+        # image is the undersampled image which is fed to Unet model
+        # image now is torch.Size([320, 320]) same as target shape
         image = fastmri.complex_abs(image)
 
         # apply Root-Sum-of-Squares if multicoil data
@@ -322,7 +339,8 @@ class UnetDataTransform:
         else:
             target = torch.Tensor([0])
 
-        return image, target, mean, std, fname, slice_num, max_value
+        # return ksp_mask to be used in post processing.
+        return image, target, mean, std, fname, slice_num, max_value, ksp_mask
 
 
 class VarNetDataTransform:

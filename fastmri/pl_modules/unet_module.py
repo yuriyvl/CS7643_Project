@@ -12,6 +12,15 @@ from fastmri.models import Unet
 from torch.nn import functional as F
 
 from .mri_module import MriModule
+import fastmri
+
+def fft_shift(input: torch.Tensor
+              ) -> torch.Tensor:
+    # PyTorch version of np.fftshift
+    # input: (Bx)CxHxWx2
+    dims = [i for i in range(1 if input.dim() == 4 else 2, input.dim() - 1)]  # H, W
+    shift = [input.size(dim) // 2 for dim in dims]
+    return torch.roll(input, shift, dims)
 
 
 class UnetModule(MriModule):
@@ -81,9 +90,26 @@ class UnetModule(MriModule):
         return self.unet(image.unsqueeze(1)).squeeze(1)
 
     def training_step(self, batch, batch_idx):
-        image, target, _, _, _, _, _ = batch
+        # Get the undersampled kspace data to be used for post processing.
+        image, target, _, _, _, _, _, kspace = batch
+        # Get the unet output
         output = self(image)
-        loss = F.l1_loss(output, target)
+        
+        # Compute the fiurier transform of output
+        kspace_data = output.rfft(2, normalized=True, onesided=False)
+        
+        # Shift the zero-frequency component to the center of the spectrum (Optional)
+        kspace_data = fft_shift(kspace_data)
+        
+        # Replace the unpadded parts by the original k-space data to preserve the original measured data
+        # We check for non zero value in the undersampled kspace data and put that value in kspace_data at the right location
+        kspace_data = torch.where(kspace != 0.0, kspace, kspace_data)
+        
+        # Take inverse fourier transform and absolute value to get the reconstructed image
+        kspace_data = fastmri.complex_abs(fastmri.ifft2c(torch.squeeze(kspace_data))).unsqueeze(0)
+        
+        # Pass this new reconstructed image to the loss function
+        loss = F.l1_loss(kspace_data, target)
 
         self.log("loss", loss.detach())
 
