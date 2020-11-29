@@ -26,7 +26,7 @@ class NestedUnetModule(MriModule):
         lr=0.01,
         lr_step_size=20,
         lr_gamma=0.1,
-        weight_decay=0.0,
+        weight_decay=0,
         **kwargs,
     ):
         super().__init__(**kwargs)
