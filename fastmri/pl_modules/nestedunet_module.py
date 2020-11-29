@@ -18,7 +18,7 @@ from .unet_module import UnetModule
 class NestedUnetModule(MriModule):
     def __init__(
         self,
-        in_chans=1,
+        in_chans=3,
         out_chans=1,
         chans=32,
         num_pool_layers=4,
@@ -26,7 +26,7 @@ class NestedUnetModule(MriModule):
         lr=0.001,
         lr_step_size=40,
         lr_gamma=0.1,
-        weight_decay=0.0,
+        weight_decay=0,
         **kwargs,
     ):
         super().__init__(**kwargs)
