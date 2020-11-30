@@ -10,5 +10,6 @@ from .nnret import NnRet
 from .r2unet import R2Unet
 from .nestedunet import NestedUnet
 from .dunet import DenseUNet
+from .rdunet import ResidualDenseUNet
 from .attnunet import AttnUnet
 from .varnet import NormUnet, SensitivityModel, VarNet, VarNetBlock
