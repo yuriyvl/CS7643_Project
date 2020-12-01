@@ -15,3 +15,4 @@ from .data_module import FastMriDataModule
 from .r2unet import R2UnetModule
 from .attnunet_module import AttnUnetModule
 from .rdunet_module import ResidualDenseUNetModule
+from .resnet_module import ResNetModule

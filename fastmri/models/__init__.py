@@ -13,3 +13,4 @@ from .dunet import DenseUNet
 from .rdunet import ResidualDenseUNet
 from .attnunet import AttnUnet
 from .varnet import NormUnet, SensitivityModel, VarNet, VarNetBlock
+from .resnet import ResNet, ResNet5Block
