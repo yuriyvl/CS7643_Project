@@ -90,7 +90,10 @@ def run(debug=True):
     run_model('Dense U-Net', 'denseunet/', 'results.txt', debug)
     run_model('U-Net+', 'unetplus/', 'results.txt', debug)
     run_model('U-Net+ Deep Supervision', 'unetplus_deepsupervision/', 'results.txt', debug)
-    run_model('NNRET', 'nnret/', 'nnrnet_output.txt', debug)
+    run_model('NNRET U-Net', 'nnret/', 'nnrnet_output.txt', debug)
     run_model('R2U-Net', 'r2unet/', 'results.txt', debug)
+    run_model('Attention U-Net', 'r2unet/', 'results.txt', debug)
+    run_model('Residual Dense U-Net', 'residualdenseunet/', 'output.txt', debug)
+    run_model('ResNet', 'resnet/', 'output.txt', debug)
 
 run(False)
