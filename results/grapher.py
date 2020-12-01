@@ -58,42 +58,79 @@ def clean_val(epochs, val_losses):
     
     return new_epochs, new_val_losses
 
-def plot(epochs, losses, y_label, name, debug=True):
-    epochs = [float(i) for i in epochs]
-    losses = [float(i) for i in losses]
-
-    _, ax = plt.subplots()
-    plt.plot(epochs, losses)
-    
-    plt.title(name)
-    plt.xlabel('Epochs')
-    plt.ylabel(y_label)
-    
-    if debug:
-        plt.show()
-    else:
-        plt.savefig(name + '_' + y_label + '.png', bbox_inches='tight')
-
-def run_model(model_name, folder, file_name, debug=True):
+def get_plottable(model_name, folder, file_name):
     all_lines = get_all_lines(folder, file_name)
     useful_lines = get_useful_lines(all_lines)
     epochs, train_losses, val_losses = get_tokens(useful_lines)
     
     clean_train_epochs, clean_train_losses = clean_train(epochs, train_losses)
     clean_val_epochs, clean_val_losses = clean_val(epochs, val_losses)
+
+    return {model_name: [clean_train_epochs, clean_train_losses, clean_val_epochs, clean_val_losses]}
+
+def plot(plottables, x_i, y_i, graph_name, debug=True):
+
+    for model_name, values in plottables.items():
+        epochs = [float(i) for i in values[x_i]]
+        losses = [float(i) for i in values[y_i]]
+        plt.plot(epochs, losses, label=model_name)
     
-    plot(clean_train_epochs, clean_train_losses, 'Training Loss', model_name, debug)
-    plot(clean_val_epochs, clean_val_losses, 'Validation Loss', model_name, debug)
+    plt.title(graph_name)
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend(fontsize=6)
+    
+    if debug:
+        plt.show()
+    else:
+        plt.savefig(graph_name + '.png')
+
+    plt.clf()
+
+def run_models(model_names, folders, file_names, debug=True):
+    plottables = {}
+
+    for i in range(0, len(model_names)):
+        plottables.update(get_plottable(model_names[i], folders[i], file_names[i]))
+    
+    plot(plottables, 0, 1, 'Training Results', debug)
+    plot(plottables, 2, 3, 'Validation Results', debug)
 
 def run(debug=True):
-    run_model('U-Net', 'unet_original/', 'output.txt', debug)
-    run_model('Dense U-Net', 'denseunet/', 'results.txt', debug)
-    run_model('U-Net+', 'unetplus/', 'results.txt', debug)
-    run_model('U-Net+ Deep Supervision', 'unetplus_deepsupervision/', 'results.txt', debug)
-    run_model('NNRET U-Net', 'nnret/', 'nnrnet_output.txt', debug)
-    run_model('R2U-Net', 'r2unet/', 'results.txt', debug)
-    run_model('Attention U-Net', 'r2unet/', 'results.txt', debug)
-    run_model('Residual Dense U-Net', 'residualdenseunet/', 'output.txt', debug)
-    run_model('ResNet', 'resnet/', 'output.txt', debug)
+    model_names = [
+        'U-Net', 
+        'Dense U-Net', 
+        'U-Net++', 
+        'U-Net++ Deep Supervision', 
+        'NNRET U-Net',
+        'R2U-Net',
+        'Attention U-Net',
+        'Residual Dense U-Net',
+        'ResNet'
+    ]
+    folders = [
+        'unet_original/',
+        'denseunet/',
+        'unetplus/',
+        'unetplus_deepsupervision/',
+        'nnret/',
+        'r2unet/',
+        'attunet/',
+        'residualdenseunet/',
+        'resnet/'
+    ]
+    file_names = [
+        'output.txt',
+        'results.txt',
+        'results.txt',
+        'results.txt',
+        'nnrnet_output.txt',
+        'results.txt',
+        'results.txt',
+        'output.txt',
+        'output.txt'
+    ]
+
+    run_models(model_names, folders, file_names, debug)
 
 run(False)
