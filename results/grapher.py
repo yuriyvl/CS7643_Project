@@ -133,4 +133,4 @@ def run(debug=True):
 
     run_models(model_names, folders, file_names, debug)
 
-run(False)
+run(True)
