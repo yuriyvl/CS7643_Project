@@ -31,14 +31,16 @@ def run():
 
     # convert the data to a tensor -> straight from tutorial (i just extracted what the utility method does)
     data_tensor = torch.from_numpy(data)
-
-    # *** this is probably where the issue is ***
+    
+    # *** this is 100% where an issue is ***
     # ifft2 utility function from data.transforms only applies to complex inputs so we can't use it (assertion will fail)
     # so what i tried to do here is call the one from torch.ifft
     # reference: https://pytorch.org/docs/stable/generated/torch.ifft.html
     # calling it with a second param of 0, 1, 2 looks even worse
+    # i know the method is meant for complex-to-complex but i couldnt find a real-to-complex one to use
+    # i even tried casting to a complex64 type before passing it into this function but i got the same results
     data_transformed = torch.fft.ifft(data_tensor)
-
+    
     # * maybe this is an issue too? *
     # we can't call complex_abs() from data.transforms because again, it only applies to complex input types
     # so what i'm doing here is just normal abs()
