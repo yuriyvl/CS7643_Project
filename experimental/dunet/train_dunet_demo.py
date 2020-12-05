@@ -92,6 +92,16 @@ def build_args():
     # set defaults based on optional directory config
     data_path = fetch_dir("knee_path", path_config)
     default_root_dir = fetch_dir("log_path", path_config) / "dunet" / "dunet_demo"
+    
+    # image reconstruction
+    # By default this will use the saved model from the results directory
+    parser.add_argument(
+        "--recon",
+        default=False,
+        choices=(True, False),
+        type=bool,
+        help="Image reconstruction",
+    )
 
     # client arguments
     parser.add_argument(
@@ -160,9 +170,12 @@ def build_args():
     args = parser.parse_args()
 
     # configure checkpointing in checkpoint_dir
-    checkpoint_dir = args.default_root_dir / "checkpoints"
-    if not checkpoint_dir.exists():
-        checkpoint_dir.mkdir(parents=True)
+    if args.recon == True:
+        checkpoint_dir = pathlib.Path("../../results/denseunet")
+    else:
+        checkpoint_dir = args.default_root_dir / "checkpoints"
+        if not checkpoint_dir.exists():
+            checkpoint_dir.mkdir(parents=True)
 
     args.checkpoint_callback = pl.callbacks.ModelCheckpoint(
         filepath=args.default_root_dir / "checkpoints",
