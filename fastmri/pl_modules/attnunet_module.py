@@ -108,7 +108,7 @@ class AttnUnetModule(MriModule):
         }
 
     def test_step(self, batch, batch_idx):
-        image, _, mean, std, fname, slice_num, _ = batch
+        image, target, mean, std, fname, slice_num, _ = batch
         output = self.forward(image)
         mean = mean.unsqueeze(1).unsqueeze(2)
         std = std.unsqueeze(1).unsqueeze(2)
@@ -116,7 +116,7 @@ class AttnUnetModule(MriModule):
         # Slice 22 resembles a complete knee, hence save this image slice for input, output and target
         if slice_num.item() == 22:
             if not os.path.exists(''.join(fname)):
-            os.makedirs(''.join(fname))
+                os.makedirs(''.join(fname))
             
             title = ''.join(fname) + "_" + str(slice_num.item())
             
