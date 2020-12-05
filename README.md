@@ -50,7 +50,24 @@ python train_nnret_demo.py --mode test
 
 ### Extracting reconstructed images from test output
 
-TODO
+Navigate inside the `experimental/<model_name>/` folder and run the demo file inside with arguments. For example:
+
+```bash
+cd experimental
+cd unet
+python train_uret_demo.py --data_path ..\..\data --mode test --recon True
+```
+`--data_path` specify the location of the file to test with.
+`--mode` specify the type which is test in our example.
+`--recon` specify the reconstruction parameter.
+
+The python script will automatically pick the files to test under the specified directory from singlecoil_test directory.
+
+If the reconstruction is successful, the images will be placed under <file_name> directory under `experimental/<model_name>/`
+
+In our example, the file name is file1000000.h5 which has 36 slices. We pick slice 22 for reconstruction because it resembles a complete knee.
+
+The images stored are the input image to the model(file1000000.h5_22_image), the output image from the model(file1000000.h5_22_output) and the target image(file1000000.h5_22_target).
 
 ### Code References
 
