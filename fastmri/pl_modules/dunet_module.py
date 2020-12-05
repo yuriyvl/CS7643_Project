@@ -12,6 +12,8 @@ from fastmri.models import DenseUNet
 from torch.nn import functional as F
 
 from .mri_module import MriModule
+from matplotlib import pyplot as plt
+import os
 
 
 class DenseUnetModule(MriModule):
@@ -115,6 +117,25 @@ class DenseUnetModule(MriModule):
         output = self.forward(image)
         mean = mean.unsqueeze(1).unsqueeze(2)
         std = std.unsqueeze(1).unsqueeze(2)
+
+        # Slice 22 resembles a complete knee, hence save this image slice for input, output and target
+        if slice_num.item() == 22:
+            if not os.path.exists(''.join(fname)):
+            os.makedirs(''.join(fname))
+            
+            title = ''.join(fname) + "_" + str(slice_num.item())
+            
+            title1 = title + "_image"
+            plt.imshow(image.permute(1, 2, 0).detach().cpu(), cmap='gray')
+            plt.savefig(''.join(fname) + "./{}.png".format(title1))
+            
+            title1 = title + "_output"
+            plt.imshow(output.permute(1, 2, 0).detach().cpu(), cmap='gray')
+            plt.savefig(''.join(fname) + "./{}.png".format(title1))
+
+            title1 = title + "_target"
+            plt.imshow(target.permute(1, 2, 0).detach().cpu(), cmap='gray')
+            plt.savefig(''.join(fname) + "./{}.png".format(title1))
 
         return {
             "fname": fname,
