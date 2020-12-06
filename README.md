@@ -6,7 +6,7 @@
 
 We have tested this code using:
 
-* Ubuntu 18.04 / Windows 10 / Mac OS X 
+* Ubuntu 18.04 / Windows 10 / Mac OS X (Catalina)
 * Python 3.8
 * CUDA 10.1
 * CUDNN 7.6.5
