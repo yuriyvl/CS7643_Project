@@ -6,11 +6,11 @@
 
 We have tested this code using:
 
-* Ubuntu 18.04
+* Ubuntu 18.04 / Windows 10 / Mac OS X 
 * Python 3.8
 * CUDA 10.1
 * CUDNN 7.6.5
-* Two CUDA-enabled GPUs
+* 1 / 4 CUDA-enabled GPUs
 
 First install PyTorch according to the directions at the [PyTorch Website](https://pytorch.org/get-started/) for your operating system and CUDA setup.
 
