@@ -18,9 +18,11 @@ Then, navigate to the root directory and run:
 
 ```bash
 pip install -e .
+pip install -e dev-requirements.txt
 ```
-
 `pip` will handle all package dependencies. After this you should be able to run most the code in the repository.
+
+Download the dataset from the [fastMRI dataset page](https://fastmri.med.nyu.edu/), and unzip it appropriately. This project only uses the Single Coil dataset.
 
 ### Training the models
 
@@ -55,7 +57,7 @@ Navigate inside the `experimental/<model_name>/` folder and run the demo file in
 ```bash
 cd experimental
 cd unet
-python train_uret_demo.py --data_path ..\..\data --mode test --recon True
+python train_unet_demo.py --data_path ..\..\data --mode test --recon True
 ```
 `--data_path` specify the location of the file to test with.
 `--mode` specify the type which is test in our example.
