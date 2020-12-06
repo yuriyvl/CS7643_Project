@@ -102,6 +102,8 @@ class NestedUnetModule(MriModule):
             plt.imshow(target.permute(1, 2, 0).detach().cpu(), cmap='gray')
             plt.savefig(''.join(fname) + "./{}.png".format(title1))
 
+            print("Saving reconstructed images to {}\{} directory".format(os.path.dirname(os.path.realpath(__file__)), ''.join(fname)))
+
         return {
             "fname": fname,
             "slice": slice_num,
